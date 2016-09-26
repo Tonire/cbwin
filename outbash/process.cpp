@@ -46,12 +46,12 @@ AttributeHandleList::AttributeHandleList(std::vector<HANDLE> handle_list)
       m_pAttributeList(nullptr, attribute_list_deleter)
 {
     size_t size = 0;
-    BOOL ok = ::InitializeProcThreadAttributeList(NULL, 1, 0, &size)
+    BOOL ok = ::InitializeProcThreadAttributeList(NULL, 1, 0, (PSIZE_T)&size)
               || ::GetLastError() == ERROR_INSUFFICIENT_BUFFER;
     if (!ok) throw_last_error("InitializeProcThreadAttributeList(NULL, ...) failed");
 
     m_pAttributeList.reset(reinterpret_cast<LPPROC_THREAD_ATTRIBUTE_LIST>(new char[size]));
-    ok = ::InitializeProcThreadAttributeList(m_pAttributeList.get(), 1, 0, &size);
+    ok = ::InitializeProcThreadAttributeList(m_pAttributeList.get(), 1, 0, (PSIZE_T)&size);
     if (!ok) {
         delete[] reinterpret_cast<char*>(m_pAttributeList.release());
         throw_last_error("InitializeProcThreadAttributeList() failed");
